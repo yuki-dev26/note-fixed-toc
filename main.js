@@ -40,7 +40,10 @@
       return;
     }
 
-    const allHeadings = Array.from(articleBody.querySelectorAll("h2, h3"));
+    const allHeadings = Array.from(articleBody.querySelectorAll("h2, h3")).filter(heading => {
+      if (heading.closest(".o-tableOfContents")) return false;
+      return true;
+    });
     
     if (allHeadings.length === 0) {
       content.innerHTML = "<p style='padding: 16px; color: #888;'>見出しがありません</p>";
@@ -66,7 +69,7 @@
         e.preventDefault();
         const articleBody = document.querySelector(".note-common-styles__textnote-body");
         if (!articleBody) return;
-        const allHeadings = Array.from(articleBody.querySelectorAll("h2, h3"));
+        const allHeadings = Array.from(articleBody.querySelectorAll("h2, h3")).filter(h => !h.closest(".o-tableOfContents"));
         const targetHeading = allHeadings.find(h => h.innerText.trim() === text);
         if (targetHeading) {
           targetHeading.scrollIntoView({
@@ -89,7 +92,7 @@
     const articleBody = document.querySelector(".note-common-styles__textnote-body");
     if (!articleBody) return;
 
-    const allHeadings = Array.from(articleBody.querySelectorAll("h2, h3"));
+    const allHeadings = Array.from(articleBody.querySelectorAll("h2, h3")).filter(heading => !heading.closest(".o-tableOfContents"));
     if (allHeadings.length === 0) return;
 
     let currentHeading = null;
