@@ -68,7 +68,7 @@ note-agenda/
 
 ## License
 
-Copyright (c) 2025 [yuki-P](https://x.com/yuki_p02)
+Copyright (c) 2026 [yuki-P](https://x.com/yuki_p02)
 Licensed under the [MIT License](LICENSE).
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
