@@ -75,6 +75,9 @@
   }
 
   function updateActiveSection(content) {
+    const floater = content.closest(".note-toc-floater");
+    if (floater && floater.classList.contains("minimized")) return;
+
     const articleBody = getArticleBody();
     if (!articleBody) return;
 
