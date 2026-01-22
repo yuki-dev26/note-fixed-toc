@@ -141,6 +141,13 @@
   border-left-color: #333;
 }
 
+.note-toc-floater a.active {
+  background: rgba(0, 0, 0, 0.08);
+  color: #000;
+  font-weight: 600;
+  border-left-color: #000;
+}
+
 .note-toc-min-icon {
   position: absolute;
   top: 0;

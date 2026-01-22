@@ -110,6 +110,44 @@
 
     const observer = new MutationObserver(updateLinks);
     observer.observe(originalToc, { childList: true, subtree: true });
+
+    function updateActiveSection() {
+      const articleBody =
+        document.querySelector(".note-common-styles__textnote-body") ||
+        document;
+      const allHeadings = Array.from(
+        articleBody.querySelectorAll("h2, h3, h4, h5, h6"),
+      );
+
+      if (allHeadings.length === 0) return;
+
+      let currentHeading = null;
+      const scrollPosition = window.scrollY + 150;
+
+      for (let i = allHeadings.length - 1; i >= 0; i--) {
+        const heading = allHeadings[i];
+        if (heading.offsetTop <= scrollPosition) {
+          currentHeading = heading;
+          break;
+        }
+      }
+
+      const links = content.querySelectorAll("a");
+      links.forEach((link) => {
+        link.classList.remove("active");
+        if (currentHeading && link.textContent.trim() === currentHeading.innerText.trim()) {
+          link.classList.add("active");
+        }
+      });
+    }
+
+    let scrollTimeout;
+    window.addEventListener("scroll", () => {
+      clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(updateActiveSection, 50);
+    }, { passive: true });
+
+    setTimeout(updateActiveSection, 500);
   }
 
   function findAndInit() {
