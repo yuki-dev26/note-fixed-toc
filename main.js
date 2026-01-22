@@ -3,6 +3,7 @@
 
   let tocGenerated = false;
   let currentUrl = location.href;
+  let retryTimeout = null;
 
   function isArticlePage() {
     return /note\.com\/[^/]+\/n\//.test(location.href);
@@ -14,13 +15,27 @@
       floater.remove();
     }
     tocGenerated = false;
+    if (retryTimeout) {
+      clearTimeout(retryTimeout);
+      retryTimeout = null;
+    }
   }
 
-  function generateTocContent(content) {
+  function generateTocContent(content, retryCount = 0) {
+    const maxRetries = 3;
+    const retryDelay = 1000;
+
     content.innerHTML = "";
 
     const articleBody = document.querySelector(".note-common-styles__textnote-body");
     if (!articleBody) {
+      if (retryCount < maxRetries) {
+        content.innerHTML = "<p style='padding: 16px; color: #888;'>読み込み中...</p>";
+        retryTimeout = setTimeout(() => {
+          generateTocContent(content, retryCount + 1);
+        }, retryDelay);
+        return;
+      }
       content.innerHTML = "<p style='padding: 16px; color: #888;'>記事本文が見つかりません</p>";
       return;
     }
@@ -169,7 +184,7 @@
       currentUrl = location.href;
       removeFloater();
       tocGenerated = false;
-      updatePage();
+      setTimeout(updatePage, 100);
     }
   }
 
@@ -187,6 +202,15 @@
   };
 
   window.addEventListener("popstate", checkUrlChange);
+
+  window.addEventListener("pageshow", (event) => {
+    if (event.persisted) {
+      removeFloater();
+      tocGenerated = false;
+      currentUrl = location.href;
+      updatePage();
+    }
+  });
 
   setInterval(checkUrlChange, 500);
 
