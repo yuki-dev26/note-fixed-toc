@@ -92,12 +92,22 @@
     }
 
     const links = content.querySelectorAll("a");
+    let activeLink = null;
+
     links.forEach((link) => {
       link.classList.remove("active");
       if (currentHeading && link.textContent.trim() === currentHeading.innerText.trim()) {
         link.classList.add("active");
+        activeLink = link;
       }
     });
+
+    if (activeLink) {
+      activeLink.scrollIntoView({
+        behavior: "smooth",
+        block: "nearest",
+      });
+    }
   }
 
   function clearRetryTimeout() {
