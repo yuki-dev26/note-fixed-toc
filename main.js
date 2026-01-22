@@ -64,10 +64,16 @@
 
       a.addEventListener("click", (e) => {
         e.preventDefault();
-        heading.scrollIntoView({
-          behavior: "smooth",
-          block: "start",
-        });
+        const articleBody = document.querySelector(".note-common-styles__textnote-body");
+        if (!articleBody) return;
+        const allHeadings = Array.from(articleBody.querySelectorAll("h2, h3"));
+        const targetHeading = allHeadings.find(h => h.innerText.trim() === text);
+        if (targetHeading) {
+          targetHeading.scrollIntoView({
+            behavior: "smooth",
+            block: "start",
+          });
+        }
       });
 
       li.appendChild(a);
