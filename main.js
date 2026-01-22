@@ -1,10 +1,98 @@
 (function () {
   "use strict";
 
-  let floaterCreated = false;
+  let tocGenerated = false;
+  let currentUrl = location.href;
 
-  function createFloater(originalToc) {
-    if (floaterCreated || document.getElementById("note-toc-floater")) return;
+  function isArticlePage() {
+    return /note\.com\/[^/]+\/n\//.test(location.href);
+  }
+
+  function removeFloater() {
+    const floater = document.getElementById("note-toc-floater");
+    if (floater) {
+      floater.remove();
+    }
+    tocGenerated = false;
+  }
+
+  function generateTocContent(content) {
+    content.innerHTML = "";
+
+    const articleBody = document.querySelector(".note-common-styles__textnote-body");
+    if (!articleBody) {
+      content.innerHTML = "<p style='padding: 16px; color: #888;'>記事本文が見つかりません</p>";
+      return;
+    }
+
+    const allHeadings = Array.from(articleBody.querySelectorAll("h2, h3"));
+    
+    if (allHeadings.length === 0) {
+      content.innerHTML = "<p style='padding: 16px; color: #888;'>見出しがありません</p>";
+      return;
+    }
+
+    const list = document.createElement("ul");
+
+    allHeadings.forEach((heading) => {
+      const text = heading.innerText.trim();
+      if (!text) return;
+
+      const li = document.createElement("li");
+      const a = document.createElement("a");
+      a.href = "#";
+      a.textContent = text;
+
+      if (heading.tagName.toLowerCase() === "h3") {
+        a.style.paddingLeft = "24px";
+      }
+
+      a.addEventListener("click", (e) => {
+        e.preventDefault();
+        heading.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+      });
+
+      li.appendChild(a);
+      list.appendChild(li);
+    });
+
+    content.appendChild(list);
+    tocGenerated = true;
+    updateActiveSection(content);
+  }
+
+  function updateActiveSection(content) {
+    const articleBody = document.querySelector(".note-common-styles__textnote-body");
+    if (!articleBody) return;
+
+    const allHeadings = Array.from(articleBody.querySelectorAll("h2, h3"));
+    if (allHeadings.length === 0) return;
+
+    let currentHeading = null;
+    const scrollPosition = window.scrollY + 150;
+
+    for (let i = allHeadings.length - 1; i >= 0; i--) {
+      const heading = allHeadings[i];
+      if (heading.offsetTop <= scrollPosition) {
+        currentHeading = heading;
+        break;
+      }
+    }
+
+    const links = content.querySelectorAll("a");
+    links.forEach((link) => {
+      link.classList.remove("active");
+      if (currentHeading && link.textContent.trim() === currentHeading.innerText.trim()) {
+        link.classList.add("active");
+      }
+    });
+  }
+
+  function createFloater() {
+    if (document.getElementById("note-toc-floater")) return;
 
     const floater = document.createElement("div");
     floater.id = "note-toc-floater";
@@ -29,59 +117,6 @@
     const content = document.createElement("div");
     content.className = "note-toc-content";
 
-    const updateLinks = () => {
-      content.innerHTML = "";
-      const list = document.createElement("ul");
-
-      const items = originalToc.querySelectorAll(".o-tableOfContents__item");
-      const articleBody =
-        document.querySelector(".note-common-styles__textnote-body") ||
-        document;
-      const allHeadings = Array.from(
-        articleBody.querySelectorAll("h2, h3, h4, h5, h6"),
-      );
-
-      items.forEach((item) => {
-        const btn = item.querySelector(".o-tableOfContents__link");
-        if (!btn) return;
-
-        const text = btn.innerText.trim();
-        if (text.includes("すべて表示")) return;
-
-        const li = document.createElement("li");
-        const a = document.createElement("a");
-        a.href = "#";
-        a.textContent = text;
-
-        const level = item.getAttribute("data-level");
-        if (level === "h3") { 
-          a.style.paddingLeft = "24px";
-        } else if (level === "h4") {
-          a.style.paddingLeft = "36px";
-        }
-
-        a.addEventListener("click", (e) => {
-          e.preventDefault();
-          const targetHeading = allHeadings.find(
-            (h) => h.innerText.trim() === text,
-          );
-
-          if (targetHeading) {
-            targetHeading.scrollIntoView({
-              behavior: "smooth",
-              block: "start",
-            });
-          }
-        });
-
-        li.appendChild(a);
-        list.appendChild(li);
-      });
-      content.appendChild(list);
-    };
-
-    updateLinks();
-
     floater.appendChild(header);
     floater.appendChild(minIcon);
     floater.appendChild(content);
@@ -89,14 +124,21 @@
 
     const toggleBtn = header.querySelector(".note-toc-toggle");
     const toggleIcon = header.querySelector(".note-toc-toggle svg");
+
+    generateTocContent(content);
+
     const toggle = () => {
-      floater.classList.toggle("minimized");
       const isMin = floater.classList.contains("minimized");
-      toggleBtn.title = isMin ? "表示" : "最小化";
+      
+      if (isMin) {
+        generateTocContent(content);
+      }
+      
+      floater.classList.toggle("minimized");
+      const newIsMin = floater.classList.contains("minimized");
+      toggleBtn.title = newIsMin ? "表示" : "最小化";
       toggleIcon.style.transition = "transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)";
-      toggleIcon.style.transform = isMin
-        ? "rotate(180deg)"
-        : "rotate(0deg)";
+      toggleIcon.style.transform = newIsMin ? "rotate(180deg)" : "rotate(0deg)";
     };
 
     header.addEventListener("click", (e) => {
@@ -106,62 +148,47 @@
 
     minIcon.addEventListener("click", toggle);
 
-    floaterCreated = true;
-
-    const observer = new MutationObserver(updateLinks);
-    observer.observe(originalToc, { childList: true, subtree: true });
-
-    function updateActiveSection() {
-      const articleBody =
-        document.querySelector(".note-common-styles__textnote-body") ||
-        document;
-      const allHeadings = Array.from(
-        articleBody.querySelectorAll("h2, h3, h4, h5, h6"),
-      );
-
-      if (allHeadings.length === 0) return;
-
-      let currentHeading = null;
-      const scrollPosition = window.scrollY + 150;
-
-      for (let i = allHeadings.length - 1; i >= 0; i--) {
-        const heading = allHeadings[i];
-        if (heading.offsetTop <= scrollPosition) {
-          currentHeading = heading;
-          break;
-        }
-      }
-
-      const links = content.querySelectorAll("a");
-      links.forEach((link) => {
-        link.classList.remove("active");
-        if (currentHeading && link.textContent.trim() === currentHeading.innerText.trim()) {
-          link.classList.add("active");
-        }
-      });
-    }
-
     let scrollTimeout;
     window.addEventListener("scroll", () => {
+      if (!tocGenerated) return;
       clearTimeout(scrollTimeout);
-      scrollTimeout = setTimeout(updateActiveSection, 50);
+      scrollTimeout = setTimeout(() => updateActiveSection(content), 50);
     }, { passive: true });
-
-    setTimeout(updateActiveSection, 500);
   }
 
-  function findAndInit() {
-    const originalToc = document.querySelector(".o-tableOfContents");
-    if (originalToc) {
-      createFloater(originalToc);
+  function updatePage() {
+    if (isArticlePage()) {
+      createFloater();
+    } else {
+      removeFloater();
     }
   }
 
-  findAndInit();
+  function checkUrlChange() {
+    if (location.href !== currentUrl) {
+      currentUrl = location.href;
+      removeFloater();
+      tocGenerated = false;
+      updatePage();
+    }
+  }
 
-  const bodyObserver = new MutationObserver((mutations) => {
-    findAndInit();
-  });
+  const originalPushState = history.pushState;
+  const originalReplaceState = history.replaceState;
 
-  bodyObserver.observe(document.body, { childList: true, subtree: true });
+  history.pushState = function(...args) {
+    originalPushState.apply(this, args);
+    checkUrlChange();
+  };
+
+  history.replaceState = function(...args) {
+    originalReplaceState.apply(this, args);
+    checkUrlChange();
+  };
+
+  window.addEventListener("popstate", checkUrlChange);
+
+  setInterval(checkUrlChange, 500);
+
+  updatePage();
 })();
