@@ -12,10 +12,15 @@
                 "https://note.com/*"
             ],
             "js": [
-                "main.js"
+                "src/modules/constants.js",
+                "src/modules/utils.js",
+                "src/modules/toc.js",
+                "src/modules/floater.js",
+                "src/modules/navigation.js",
+                "src/main.js"
             ],
             "css": [
-                "style.css"
+                "src/style.css"
             ],
             "run_at": "document_end"
         }

@@ -41,12 +41,15 @@ note記事の目次を画面右下に固定表示するChrome拡張機能です�
 ## ファイル構成
 
 ```text
-note-agenda/
-├── manifest.json      # 拡張機能の設定ファイル
-├── main.js            # 固定目次の生成と動作処理
-├── style.css          # 固定目次のスタイル
-├── icon.png           # 拡張機能のアイコン
-└── README.md          # このファイル
+note-fixed-toc/
+├── manifest.json       # 拡張機能の設定ファイル
+├── icon.png            # 拡張機能のアイコン
+├── LICENSE
+├── README.md
+└── src/
+    ├── main.js         # エントリポイント
+    ├── style.css       # スタイル
+    └── modules/        # 各モジュール
 ```
 
 ## 注意事項
