@@ -45,7 +45,6 @@ note記事の目次を画面右下に固定表示するChrome拡張機能です�
 ```text
 note-fixed-toc/
 ├── manifest.json       # 拡張機能の設定ファイル
-├── icon.png            # 拡張機能のアイコン
 ├── LICENSE
 ├── README.md
 └── src/
