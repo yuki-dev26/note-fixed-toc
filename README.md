@@ -2,7 +2,7 @@
 
 note記事の目次を画面右下に固定表示するChrome拡張機能です。
 
-<img width="2302" height="1238" alt="image" src="https://github.com/user-attachments/assets/294043da-8bc8-4813-98b5-94a539c42c8b" />
+<img width="1280" height="670" alt="image" src="https://github.com/user-attachments/assets/9530ae5b-2fec-4248-8554-8ea503bab45c" />
 
 ## 機能
 
