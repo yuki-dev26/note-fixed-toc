@@ -1,9 +1,35 @@
 (function () {
   "use strict";
 
-  const { SELECTORS, TIMING, ICONS } = window.NoteToc;
+  const { SELECTORS, TIMING, ICONS, STORAGE_KEYS } = window.NoteToc;
   const { createElement } = window.NoteToc.utils;
   const { state: tocState, generateTocContent, updateActiveSection, resetState } = window.NoteToc.toc;
+
+  function getSavedTheme() {
+    try {
+      return localStorage.getItem(STORAGE_KEYS.theme) === "dark" ? "dark" : "light";
+    } catch {
+      return "light";
+    }
+  }
+
+  function saveTheme(theme) {
+    try {
+      localStorage.setItem(STORAGE_KEYS.theme, theme);
+    } catch {
+      // ignore quota / privacy mode errors
+    }
+  }
+
+  function applyTheme(floater, theme) {
+    floater.classList.toggle("dark", theme === "dark");
+    const themeBtn = floater.querySelector(".note-toc-theme");
+    if (!themeBtn) return;
+
+    themeBtn.innerHTML = theme === "dark" ? ICONS.sun : ICONS.moon;
+    themeBtn.title = theme === "dark" ? "ライトモード" : "ダークモード";
+    themeBtn.setAttribute("aria-label", themeBtn.title);
+  }
 
   function removeFloater() {
     const floater = document.getElementById(SELECTORS.floater);
@@ -16,11 +42,16 @@
   function createFloaterHeader() {
     const header = createElement("div", { className: "note-toc-header" });
     header.innerHTML = `
-      <h3 class="note-toc-title">
-        ${ICONS.list}
-        目次
-      </h3>
-      <button class="note-toc-toggle" title="最小化">
+      <div class="note-toc-header-left">
+        <h3 class="note-toc-title">
+          ${ICONS.list}
+          目次
+        </h3>
+        <button type="button" class="note-toc-theme" title="ダークモード" aria-label="ダークモード">
+          ${ICONS.moon}
+        </button>
+      </div>
+      <button type="button" class="note-toc-toggle" title="最小化">
         ${ICONS.chevronUp}
       </button>
     `;
@@ -31,6 +62,16 @@
     return createElement("div", {
       className: "note-toc-min-icon",
       innerHTML: ICONS.listLarge,
+    });
+  }
+
+  function setupThemeToggle(floater, header) {
+    const themeBtn = header.querySelector(".note-toc-theme");
+    themeBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const nextTheme = floater.classList.contains("dark") ? "light" : "dark";
+      applyTheme(floater, nextTheme);
+      saveTheme(nextTheme);
     });
   }
 
@@ -53,6 +94,7 @@
     };
 
     header.addEventListener("click", (e) => {
+      if (e.target.closest(".note-toc-theme")) return;
       e.stopPropagation();
       toggle();
     });
@@ -90,7 +132,9 @@
     floater.appendChild(content);
     document.body.appendChild(floater);
 
+    applyTheme(floater, getSavedTheme());
     generateTocContent(content);
+    setupThemeToggle(floater, header);
     setupToggleBehavior(floater, header, minIcon, content);
     setupScrollListener(content);
   }

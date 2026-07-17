@@ -14,7 +14,7 @@
   function getHeadings(articleBody) {
     if (!articleBody) return [];
     return Array.from(articleBody.querySelectorAll("h2, h3")).filter(
-      (heading) => !heading.closest(SELECTORS.tocContainer)
+      (heading) => !heading.closest(SELECTORS.tocContainer),
     );
   }
 
@@ -29,7 +29,12 @@
   }
 
   function showMessage(container, message) {
-    container.innerHTML = `<p style='padding: 16px; color: #888;'>${message}</p>`;
+    container.replaceChildren();
+    const p = createElement("p", {
+      textContent: message,
+      style: { padding: "16px", color: "#888" },
+    });
+    container.appendChild(p);
   }
 
   window.NoteToc.utils = {
