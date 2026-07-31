@@ -53,10 +53,6 @@ note-fixed-toc/
 - **見出しが必要**: 見出しが1つ以上ある記事で機能します
 - **非公式**: 非公式の拡張機能です。note株式会社とは関係ありません。自己責任でお使いください
 
-## Supporters
-
-[![note メンバーシップ](https://img.shields.io/badge/note-Membership-41C9B4?style=for-the-badge&logo=note&logoColor=white)](https://note.com/yuki_tech/membership/members)
-
 ## License
 
 Copyright (c) 2026 [yuki-P](https://x.com/yuki_p02)
