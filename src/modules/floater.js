@@ -3,11 +3,18 @@
 
   const { SELECTORS, TIMING, ICONS, STORAGE_KEYS } = window.NoteToc;
   const { createElement } = window.NoteToc.utils;
-  const { state: tocState, generateTocContent, updateActiveSection, resetState } = window.NoteToc.toc;
+  const {
+    state: tocState,
+    generateTocContent,
+    updateActiveSection,
+    resetState,
+  } = window.NoteToc.toc;
 
   function getSavedTheme() {
     try {
-      return localStorage.getItem(STORAGE_KEYS.theme) === "dark" ? "dark" : "light";
+      return localStorage.getItem(STORAGE_KEYS.theme) === "dark"
+        ? "dark"
+        : "light";
     } catch {
       return "light";
     }
@@ -26,7 +33,7 @@
     const themeBtn = floater.querySelector(".note-toc-theme");
     if (!themeBtn) return;
 
-    themeBtn.innerHTML = theme === "dark" ? ICONS.sun : ICONS.moon;
+    themeBtn.innerHTML = theme === "dark" ? ICONS.moon : ICONS.sun;
     themeBtn.title = theme === "dark" ? "ライトモード" : "ダークモード";
     themeBtn.setAttribute("aria-label", themeBtn.title);
   }
@@ -48,7 +55,7 @@
           目次
         </h3>
         <button type="button" class="note-toc-theme" title="ダークモード" aria-label="ダークモード">
-          ${ICONS.moon}
+          ${ICONS.sun}
         </button>
       </div>
       <button type="button" class="note-toc-toggle" title="最小化">
@@ -89,7 +96,8 @@
       floater.classList.toggle("minimized");
       const newIsMin = floater.classList.contains("minimized");
       toggleBtn.title = newIsMin ? "表示" : "最小化";
-      toggleIcon.style.transition = "transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)";
+      toggleIcon.style.transition =
+        "transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)";
       toggleIcon.style.transform = newIsMin ? "rotate(180deg)" : "rotate(0deg)";
     };
 
@@ -109,9 +117,12 @@
       () => {
         if (!tocState.tocGenerated) return;
         clearTimeout(scrollTimeout);
-        scrollTimeout = setTimeout(() => updateActiveSection(content), TIMING.scrollDebounce);
+        scrollTimeout = setTimeout(
+          () => updateActiveSection(content),
+          TIMING.scrollDebounce,
+        );
       },
-      { passive: true }
+      { passive: true },
     );
   }
 
